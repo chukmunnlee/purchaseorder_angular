@@ -1,0 +1,46 @@
+
+<h2>New Purchase Order</h2>
+
+<form [formGroup]="poForm" (submit)="process()">
+  <table>
+    <tr>
+      <td>Name:</td>
+      <td>
+        <input type="text" placeholder="Name" formControlName="name">
+      </td>
+    </tr>
+    <tr>
+      <td>Address:</td>
+      <td>
+        <input type="text" placeholder="Address" formControlName="address">
+      </td>
+    </tr>
+    <tr>
+      <td>Email:</td>
+      <td>
+        <input type="email" placeholder="Email" formControlName="email">
+      </td>
+    </tr>
+    <tr>
+      <td>Delivery date:</td>
+      <td>
+        <input type="date" placeholder="Delivery date" formControlName="deliveryDate">
+      </td>
+    </tr>
+    <tr>
+      <td>Comments:</td>
+      <td>
+        <textarea cols="30" rows="4" formControlName="comments"></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <div style="display: flex; justify-content: space-between;">
+          <button type="button" [routerLink]="['/']">Back</button>
+          <button type="submit" [disabled]="poForm.invalid">Create</button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</form>
