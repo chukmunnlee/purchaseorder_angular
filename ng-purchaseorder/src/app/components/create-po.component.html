@@ -38,9 +38,42 @@
       <td>
         <div style="display: flex; justify-content: space-between;">
           <button type="button" [routerLink]="['/']">Back</button>
-          <button type="submit" [disabled]="poForm.invalid">Create</button>
+          <button type="submit" [disabled]="invalid()">Create</button>
+          <button type="button" (click)="addLineItem()">Add Item</button>
         </div>
       </td>
     </tr>
   </table>
+
+  @if (liArray.length > 0) {
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Unit Price ($)</th>
+        </tr>
+      </thead>
+      <tbody formArrayName="lineItems">
+        @for (li of liArray.controls; track i; let i = $index) {
+          <tr [formGroupName]="i">
+            <td>
+              <input type="text" size="30" formControlName="item">
+            </td>
+            <td>
+              <input type="number" size="10" min="1" formControlName="quantity">
+            </td>
+            <td>
+              <input type="number" size="10" min=".1" step=".1" formControlName="unitPrice">
+            </td>
+            <td>
+              <button type="button" (click)="removeLineItem(i)">X</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <h2>You have no items in your order.</h2>
+  }
 </form>

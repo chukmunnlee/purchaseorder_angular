@@ -1,6 +1,33 @@
 
 <h2>List of Purchase Orders</h2>
 
-<div>
+<div style="margin-bottom: 10px;">
   <button type="button" [routerLink]="['/create']">Create</button>
 </div>
+
+@if (purchaseOrders$ | async; as pos) {
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Delivery Date</th>
+        <th>Total ($)</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (po of pos; track i; let i = $index) {
+        <tr>
+          <td> <code>{{ po.poId }}</code> </td>
+          <td> {{ po.name }} </td>
+          <td> {{ po.deliveryDate | date }} </td>
+          <td> {{ po.total | currency }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+} @else {
+  <h2>No purchase orders</h2>
+}
+
+
