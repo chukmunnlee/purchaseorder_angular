@@ -1,5 +1,5 @@
 import {CommonModule} from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, Signal, computed, inject, signal } from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {PurchaseOrderService} from '../purchaseorder.service';
 import {Observable, from, map, tap} from 'rxjs';
@@ -16,8 +16,17 @@ export class MainComponent implements OnInit {
 
   private poSvc = inject(PurchaseOrderService)
 
-  purchaseOrders$!: Observable<PurchaseOrderSummary[]>
   purchaseOrder$!: Promise<PurchaseOrder | undefined>
+
+  // signals, set(newVal), update(oldVal => newVal)
+  purchaseOrders = signal<PurchaseOrderSummary[]>([])
+  purchaseOrder = signal<PurchaseOrder | undefined>(undefined)
+  total: Signal<number> = computed(() => {
+    var t: number = 0
+    for (var po of this.purchaseOrders())
+      t += po.total
+    return t
+  })
 
   ngOnInit(): void {
     this.update()
@@ -26,31 +35,29 @@ export class MainComponent implements OnInit {
   deletePurchaseOrder(poId: string) {
     console.info('>>> delete poId: ', poId)
     this.poSvc.deletePurchaseOrder(poId)
-        .then(count => this.update())
+        .then(_ => this.update())
         .catch(error => alert(`Delete error\n${JSON.stringify(error)}`))
   }
 
   showPurchaseOrder(poId: string) {
     console.info('>>> show poId: ', poId)
-    this.purchaseOrder$ = this.poSvc.findPurchaseOrderById(poId)
+    this.poSvc.findPurchaseOrderById(poId)
+      .then(po => this.purchaseOrder.set(po))
   }
 
   private update() {
-    this.purchaseOrders$ = from(this.poSvc.getPurchaseOrderSummary())
-      .pipe(
-        map(pos => {
-          //@ts-ignore
-          pos.sort((p0, p1) => {
-            if (p0.deliveryDate < p1.deliveryDate)
-              return -1
-            else if (p0.deliveryDate > p1.deliveryDate)
-              return 1
-            else 0
-          })
-          return pos
-        }),
-        tap(data => console.info('data: ', data))
-      )
+    this.poSvc.getPurchaseOrderSummary()
+      .then(pos => {
+        //@ts-ignore
+        pos.sort((p0, p1) => {
+          if (p0.deliveryDate < p1.deliveryDate)
+            return -1
+          else if (p0.deliveryDate > p1.deliveryDate)
+            return 1
+          else 0
+        })
+        this.purchaseOrders.set(pos)
+      })
   }
 
 }
