@@ -4,6 +4,7 @@ import { Routes } from '@angular/router';
 
 import {MainComponent} from './components/main.component';
 import {CreatePoComponent} from './components/create-po.component';
+import {PurchaseOrderService} from './purchaseorder.service';
 
 export const routes: Routes = [
   { path: '', component: MainComponent },
@@ -11,5 +12,8 @@ export const routes: Routes = [
 ];
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes, withHashLocation())]
+  providers: [
+    provideRouter(routes, withHashLocation()),
+    PurchaseOrderService
+  ]
 };

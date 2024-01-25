@@ -3,7 +3,7 @@ export interface PurchaseOrder {
   name: string
   address: string
   email: string
-  deliveryDate: string
+  deliveryDate: number
   comments: string
   lineItems: LineItem[]
 }
@@ -17,6 +17,6 @@ export interface LineItem {
 export interface PurchaseOrderSummary {
   poId: string
   name: string
-  deliveryDate: string
+  deliveryDate: number
   total: number
 }

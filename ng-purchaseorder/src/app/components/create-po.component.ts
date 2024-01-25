@@ -10,7 +10,6 @@ import {PurchaseOrderService} from '../purchaseorder.service';
   selector: 'app-create-po',
   standalone: true,
   imports: [ CommonModule, RouterModule, ReactiveFormsModule ],
-  providers: [ PurchaseOrderService ],
   templateUrl: './create-po.component.html',
   styleUrl: './create-po.component.css'
 })
@@ -29,6 +28,7 @@ export class CreatePoComponent implements OnInit {
 
   process() {
     const po: PurchaseOrder = this.poForm.value
+    po.deliveryDate = new Date(this.poForm.value['deliveryDate']).getTime()
     this.poSvc.newPurchaseOrder(po)
       .then(id => {
         console.info(`po id: ${id}`)

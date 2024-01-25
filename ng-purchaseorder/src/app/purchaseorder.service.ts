@@ -3,7 +3,7 @@ import Dexie, {Table} from "dexie";
 import {LineItem, PurchaseOrder, PurchaseOrderSummary} from "./models";
 import {ulid} from "ulidx";
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class PurchaseOrderService extends Dexie {
 
   poTable!: Table<PurchaseOrder, string>
@@ -34,5 +34,16 @@ export class PurchaseOrderService extends Dexie {
           total
         } as PurchaseOrderSummary
       }))
+  }
+
+  findPurchaseOrderById(poId: string): Promise<PurchaseOrder | undefined> {
+      return this.poTable.filter(po => po.poId == poId)
+        .toArray()
+        .then(pos => !!pos.length? pos[0]: undefined)
+  }
+
+  deletePurchaseOrder(poId: string): Promise<number> {
+    return this.poTable.where("poId").equals(poId)
+        .delete()
   }
 }
