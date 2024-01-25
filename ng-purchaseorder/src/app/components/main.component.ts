@@ -2,7 +2,7 @@ import {CommonModule} from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {PurchaseOrderService} from '../purchaseorder.service';
-import {Observable, from, map, switchMap, tap} from 'rxjs';
+import {Observable, from, map, tap} from 'rxjs';
 import {PurchaseOrder, PurchaseOrderSummary} from '../models';
 
 @Component({
