@@ -1,5 +1,5 @@
 import {Injectable, OnDestroy, inject} from "@angular/core";
-import {PurchaseOrder, PurchaseOrderSummary} from "./models";
+import {LineItem, PurchaseOrder, PurchaseOrderSummary} from "./models";
 import {ComponentStore, OnStateInit, OnStoreInit} from "@ngrx/component-store";
 import {Observable} from "rxjs";
 import { ulid } from 'ulidx'
@@ -16,18 +16,19 @@ const INIT_STATE: PurchaseOrderSlice = {
   purchaseOrders: []
 }
 
+const totalPrice = (lineItems: LineItem[]) => lineItems
+    .map(li => li.quantity * li.unitPrice)
+    .reduce((acc, t) => acc + t, 0)
+
 export const getPurchaseOrderSummary = (slice: PurchaseOrderSlice) => {
   const summary: PurchaseOrderSummary[] = []
   for (var po of slice.purchaseOrders) {
-      var total = 0
-      for (let i of po.lineItems)
-        total += i.quantity * i.unitPrice
       summary.push({
         // @ts-ignore
         poId: po.poId,
         name: po.name,
         deliveryDate: po.deliveryDate,
-        total
+        total: totalPrice(po.lineItems)
       } as PurchaseOrderSummary)
   }
   return summary
@@ -42,15 +43,12 @@ export class PurchaseOrderStore extends ComponentStore<PurchaseOrderSlice>
   readonly purchaseOrderSummary: Observable<PurchaseOrderSummary[]> =
         this.select(slice => slice.purchaseOrders.map(
           po => {
-            var total = 0
-            for (let i of po.lineItems)
-              total += i.quantity * i.unitPrice
             const summary: PurchaseOrderSummary = {
               // @ts-ignore
               poId: po.poId,
               name: po.name,
               deliveryDate: po.deliveryDate,
-              total
+              total: totalPrice(po.lineItems)
             }
             return summary
           }

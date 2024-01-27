@@ -22,12 +22,9 @@ export class MainComponent implements OnInit, OnDestroy {
   // signals, set(newVal), update(oldVal => newVal)
   purchaseOrders: Signal<PurchaseOrderSummary[]> = signal<PurchaseOrderSummary[]>([])
   purchaseOrder: Signal<PurchaseOrder | undefined> = signal(undefined)
-  total: Signal<number> = computed(() => {
-    var t: number = 0
-    for (var po of this.purchaseOrders())
-      t += po.total
-    return t
-  })
+  total: Signal<number> = computed(() =>
+    this.purchaseOrders().map(po => po.total).reduce((acc, t) => acc + t, 0)
+  )
 
   ngOnInit(): void {
     this.update()
