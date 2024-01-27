@@ -5,6 +5,8 @@ import { Routes } from '@angular/router';
 import {MainComponent} from './components/main.component';
 import {CreatePoComponent} from './components/create-po.component';
 import {PurchaseOrderService} from './purchaseorder.service';
+import {provideComponentStore} from '@ngrx/component-store';
+import {PurchaseOrderStore} from './purchaseorder.store';
 
 export interface CanLeaveRoute {
   canLeave(): boolean
@@ -25,7 +27,7 @@ export const routes: Routes = [
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withHashLocation()),
+    provideRouter(routes, withHashLocation()), provideComponentStore(PurchaseOrderStore),
     PurchaseOrderService
   ]
 };
