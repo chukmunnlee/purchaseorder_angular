@@ -5,6 +5,7 @@ import {Router, RouterModule} from '@angular/router';
 
 import {PurchaseOrder} from '../models';
 import {PurchaseOrderService} from '../purchaseorder.service';
+import {CanLeaveRoute} from '../app.config';
 
 @Component({
   selector: 'app-create-po',
@@ -13,7 +14,7 @@ import {PurchaseOrderService} from '../purchaseorder.service';
   templateUrl: './create-po.component.html',
   styleUrl: './create-po.component.css'
 })
-export class CreatePoComponent implements OnInit {
+export class CreatePoComponent implements OnInit, CanLeaveRoute {
 
   private fb = inject(FormBuilder)
   private poSvc = inject(PurchaseOrderService)
@@ -26,12 +27,24 @@ export class CreatePoComponent implements OnInit {
     this.poForm = this.createForm()
   }
 
+  canLeave(): boolean {
+    return !this.poForm.dirty
+  }
+
+  message():  string {
+    return `
+      The purchase order has not been save.
+      Are you sure you want to leave?
+    `
+  }
+
   process() {
     const po: PurchaseOrder = this.poForm.value
     po.deliveryDate = new Date(this.poForm.value['deliveryDate']).getTime()
     this.poSvc.newPurchaseOrder(po)
       .then(id => {
         console.info(`po id: ${id}`)
+        this.poForm = this.createForm()
         return this.router.navigate(['/'])
       })
       .catch(err => alert(`Create purchase order error\n${JSON.stringify(err)}`))
