@@ -16,6 +16,23 @@ const INIT_STATE: PurchaseOrderSlice = {
   purchaseOrders: []
 }
 
+export const getPurchaseOrderSummary = (slice: PurchaseOrderSlice) => {
+  const summary: PurchaseOrderSummary[] = []
+  for (var po of slice.purchaseOrders) {
+      var total = 0
+      for (let i of po.lineItems)
+        total += i.quantity * i.unitPrice
+      summary.push({
+        // @ts-ignore
+        poId: po.poId,
+        name: po.name,
+        deliveryDate: po.deliveryDate,
+        total
+      } as PurchaseOrderSummary)
+  }
+  return summary
+}
+
 @Injectable()
 export class PurchaseOrderStore extends ComponentStore<PurchaseOrderSlice>
       implements OnStoreInit, OnStateInit, OnDestroy {
@@ -39,7 +56,7 @@ export class PurchaseOrderStore extends ComponentStore<PurchaseOrderSlice>
           }
         ))
 
-  readonly addPurchaseOrder  = this.updater(
+  readonly addPurchaseOrder = this.updater(
       (slice: PurchaseOrderSlice, value: PurchaseOrder) => {
         value.poId = ulid()
         return {
@@ -49,12 +66,18 @@ export class PurchaseOrderStore extends ComponentStore<PurchaseOrderSlice>
       }
   )
 
+  readonly deletePurchaseOrder = (poId: string) =>
+      this.updater<void>(
+        (slice: PurchaseOrderSlice) => {
+          return {
+            loadedOn: slice.loadedOn,
+            purchaseOrders: slice.purchaseOrders.filter(po => poId !== po.poId)
+          } as PurchaseOrderSlice
+        }
+      )()
+
   readonly findPurchaseOrderById = (poId: string): Observable<PurchaseOrder | undefined> =>
       this.select(slice => slice.purchaseOrders.find(po => poId === po.poId))
-
-  //readonly deletePurchaseOrder = (poId: string) => this.updater(
-
-  //)
 
   constructor() {
     super(INIT_STATE)

@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit, Signal, computed, inject, signal } from '
 import {RouterModule} from '@angular/router';
 import {Observable, Subscription, firstValueFrom, from, map, tap} from 'rxjs';
 import {PurchaseOrder, PurchaseOrderSummary} from '../models';
-import {PurchaseOrderStore} from '../purchaseorder.store';
+import {PurchaseOrderStore, getPurchaseOrderSummary} from '../purchaseorder.store';
 
 @Component({
   selector: 'app-main',
@@ -20,7 +20,7 @@ export class MainComponent implements OnInit, OnDestroy {
   sub$!: Subscription
 
   // signals, set(newVal), update(oldVal => newVal)
-  purchaseOrders = signal<PurchaseOrderSummary[]>([])
+  purchaseOrders: Signal<PurchaseOrderSummary[]> = signal<PurchaseOrderSummary[]>([])
   purchaseOrder: Signal<PurchaseOrder | undefined> = signal(undefined)
   total: Signal<number> = computed(() => {
     var t: number = 0
@@ -39,11 +39,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
   deletePurchaseOrder(poId: string) {
     console.info('>>> delete poId: ', poId)
-    /*
-    this.poSvc.deletePurchaseOrder(poId)
-        .then(_ => this.update())
-        .catch(error => alert(`Delete error\n${JSON.stringify(error)}`))
-    */
+    this.poStore.deletePurchaseOrder(poId)
   }
 
   showPurchaseOrder(poId: string) {
@@ -54,8 +50,7 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   private update() {
-    this.sub$ = this.poStore.purchaseOrderSummary
-      .subscribe(pos => this.purchaseOrders.set(pos))
+    this.purchaseOrders = this.poStore.selectSignal(getPurchaseOrderSummary)
   }
 
 }
