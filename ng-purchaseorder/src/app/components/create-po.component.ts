@@ -4,8 +4,8 @@ import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from
 import {Router, RouterModule} from '@angular/router';
 
 import {PurchaseOrder} from '../models';
-import {PurchaseOrderService} from '../purchaseorder.service';
 import {CanLeaveRoute} from '../app.config';
+import {PurchaseOrderStore} from '../purchaseorder.store';
 
 @Component({
   selector: 'app-create-po',
@@ -17,7 +17,7 @@ import {CanLeaveRoute} from '../app.config';
 export class CreatePoComponent implements OnInit, CanLeaveRoute {
 
   private fb = inject(FormBuilder)
-  private poSvc = inject(PurchaseOrderService)
+  private poStore = inject(PurchaseOrderStore)
   private router = inject(Router)
 
   poForm!: FormGroup
@@ -41,13 +41,9 @@ export class CreatePoComponent implements OnInit, CanLeaveRoute {
   process() {
     const po: PurchaseOrder = this.poForm.value
     po.deliveryDate = new Date(this.poForm.value['deliveryDate']).getTime()
-    this.poSvc.newPurchaseOrder(po)
-      .then(id => {
-        console.info(`po id: ${id}`)
-        this.poForm = this.createForm()
-        return this.router.navigate(['/'])
-      })
-      .catch(err => alert(`Create purchase order error\n${JSON.stringify(err)}`))
+    this.poStore.addPurchaseOrder(po)
+    this.poForm = this.createForm()
+    this.router.navigate(['/'])
   }
 
   addLineItem() {

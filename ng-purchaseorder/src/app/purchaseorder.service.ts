@@ -11,7 +11,7 @@ export class PurchaseOrderService extends Dexie {
   constructor() {
     super("acme")
     this.version(1).stores({
-      purchaseOrder: 'poId'
+      purchaseOrder: 'poId, deliveryDate'
     })
     this.poTable = this.table('purchaseOrder')
   }
@@ -22,7 +22,10 @@ export class PurchaseOrderService extends Dexie {
   }
 
   getPurchaseOrderSummary(): Promise<PurchaseOrderSummary[]> {
-    return this.poTable.toArray()
+    return this.poTable
+      .orderBy('deliveryDate')
+      .reverse()
+      .toArray()
       .then(pos => pos.map(po => {
         let total = 0;
         for (let l of po.lineItems)

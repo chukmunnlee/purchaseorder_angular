@@ -1,7 +1,8 @@
 import {CommonModule} from '@angular/common';
-import { Component, OnDestroy, OnInit, Signal, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, Signal, computed, inject, signal } from '@angular/core';
 import {RouterModule} from '@angular/router';
-import {Observable, Subscription, firstValueFrom, from, map, tap} from 'rxjs';
+import {PurchaseOrderService} from '../purchaseorder.service';
+import {Observable, Subscription, from, map, tap} from 'rxjs';
 import {PurchaseOrder, PurchaseOrderSummary} from '../models';
 import {PurchaseOrderStore} from '../purchaseorder.store';
 
@@ -12,16 +13,17 @@ import {PurchaseOrderStore} from '../purchaseorder.store';
   templateUrl: './main.component.html',
   styleUrl: './main.component.css'
 })
-export class MainComponent implements OnInit, OnDestroy {
+export class MainComponent implements OnInit {
 
+  //private poSvc = inject(PurchaseOrderService)
   private poStore = inject(PurchaseOrderStore)
 
-  purchaseOrder$!: Observable<PurchaseOrder | undefined>
+  purchaseOrder$!: Promise<PurchaseOrder | undefined>
   sub$!: Subscription
 
   // signals, set(newVal), update(oldVal => newVal)
   purchaseOrders = signal<PurchaseOrderSummary[]>([])
-  purchaseOrder: Signal<PurchaseOrder | undefined> = signal(undefined)
+  purchaseOrder = signal<PurchaseOrder | undefined>(undefined)
   total: Signal<number> = computed(() => {
     var t: number = 0
     for (var po of this.purchaseOrders())
@@ -31,10 +33,6 @@ export class MainComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.update()
-  }
-
-  ngOnDestroy(): void {
-    this.sub$.unsubscribe()
   }
 
   deletePurchaseOrder(poId: string) {
@@ -48,9 +46,10 @@ export class MainComponent implements OnInit, OnDestroy {
 
   showPurchaseOrder(poId: string) {
     console.info('>>> show poId: ', poId)
-    this.purchaseOrder = this.poStore.selectSignal(
-      slice => slice.purchaseOrders.find(po => poId === po.poId)
-    )
+    /*
+    this.poSvc.findPurchaseOrderById(poId)
+      .then(po => this.purchaseOrder.set(po))
+    */
   }
 
   private update() {
