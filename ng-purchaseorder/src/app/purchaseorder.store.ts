@@ -54,7 +54,7 @@ export class PurchaseOrderStore extends ComponentStore<PurchaseOrderSlice>
           }
         ))
 
-  readonly addPurchaseOrder = this.updater(
+  readonly addPurchaseOrder = this.updater<PurchaseOrder>(
       (slice: PurchaseOrderSlice, value: PurchaseOrder) => {
         value.poId = ulid()
         return {
@@ -64,15 +64,14 @@ export class PurchaseOrderStore extends ComponentStore<PurchaseOrderSlice>
       }
   )
 
-  readonly deletePurchaseOrder = (poId: string) =>
-      this.updater<void>(
-        (slice: PurchaseOrderSlice) => {
-          return {
-            loadedOn: slice.loadedOn,
-            purchaseOrders: slice.purchaseOrders.filter(po => poId !== po.poId)
-          } as PurchaseOrderSlice
-        }
-      )()
+  readonly deletePurchaseOrder = this.updater<string>(
+    (slice: PurchaseOrderSlice, poId: string) => (
+      {
+        loadedOn: slice.loadedOn,
+        purchaseOrders: slice.purchaseOrders.filter(po => poId !== po.poId)
+      } as PurchaseOrderSlice
+    )
+  )
 
   readonly findPurchaseOrderById = (poId: string): Observable<PurchaseOrder | undefined> =>
       this.select(slice => slice.purchaseOrders.find(po => poId === po.poId))
