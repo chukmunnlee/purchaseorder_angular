@@ -5,7 +5,8 @@
   <button type="button" [routerLink]="['/create']">Create</button>
 </div>
 
-  @if (purchaseOrders().length > 0) {
+@if (purchaseOrders$ | async; as pos) {
+  @if (pos.length > 0) {
     <table border="1">
       <thead>
         <tr>
@@ -16,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (po of purchaseOrders(); track i; let i = $index) {
+        @for (po of pos; track i; let i = $index) {
           <tr>
             <td> <code (click)="showPurchaseOrder(po.poId)">{{ po.poId }}</code> </td>
             <td> {{ po.name }} </td>
@@ -33,15 +34,18 @@
           <td></td>
           <td></td>
           <td>Total</td>
-          <td>{{ total() | currency }}</td>
+          <td>{{ total | currency }}</td>
         </tr>
       </tfoot>
     </table>
-    } @else {
-      <h2>No purchase orders</h2>
-    }
+  } @else {
+    <h2>No purchase orders</h2>
+  }
+} @else {
+    <h2>Loading...</h2>
+}
 
-@if (purchaseOrder(); as po) {
+@if (purchaseOrder$ | async ; as po) {
 <pre>
 <code> {{ po | json }}</code>
 </pre>
