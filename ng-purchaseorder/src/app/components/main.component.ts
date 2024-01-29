@@ -18,13 +18,12 @@ export class MainComponent implements OnInit {
   private poSvc = inject(PurchaseOrderService)
   private poStore = inject(PurchaseOrderStore)
 
-  purchaseOrder$!: Promise<PurchaseOrder | undefined>
-
   // signals, set(newVal), update(oldVal => newVal)
   purchaseOrders = signal<PurchaseOrderSummary[]>([])
-  purchaseOrder = signal<PurchaseOrder | undefined>(undefined)
+  //purchaseOrder = signal<PurchaseOrder | undefined>(undefined)
 
   purchaseOrderSummaries$!: Observable<PurchaseOrderSummary[]>
+  purchaseOrder$!: Observable<PurchaseOrder | undefined>
   total$!: Observable<number>
 
   ngOnInit(): void {
@@ -40,8 +39,7 @@ export class MainComponent implements OnInit {
 
   showPurchaseOrder(poId: string) {
     console.info('>>> show poId: ', poId)
-    this.poSvc.findPurchaseOrderById(poId)
-      .then(po => this.purchaseOrder.set(po))
+    this.purchaseOrder$ = this.poStore.getPurchaseOrderById(poId)
   }
 
   private update() {

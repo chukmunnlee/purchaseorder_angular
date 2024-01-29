@@ -41,7 +41,7 @@
       <h2>No purchase orders</h2>
     }
 
-@if (purchaseOrder(); as po) {
+@if (purchaseOrder$ | async ; as po) {
 <pre>
 <code> {{ po | json }}</code>
 </pre>
